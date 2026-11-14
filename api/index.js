@@ -13,3 +13,5 @@ export * from './compiler/sass.js';
 export * from './env.js';
 export * from './image.js';
 export * from './logs.js';
+export * from './proxy/index.js';
+
