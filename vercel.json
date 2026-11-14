@@ -19,6 +19,10 @@
             "dest": "index.js"
         },
         {
+            "src": "/proxy/(.*)",
+            "dest": "index.js"
+        },
+        {
             "src": "/(.*)",
             "dest": "/$1"
         }
