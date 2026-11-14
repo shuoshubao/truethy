@@ -4,5 +4,9 @@ export const proxyConfig = {
         target: 'https://fanyi.baidu.com',
         // 是否透传 set-cookie / cookie 等
         withCredentials: false
+    },
+    youdao: {
+        target: 'https://dict.youdao.com',
+        withCredentials: false
     }
 };
