@@ -24,6 +24,36 @@ const buildTargetUrl = (target, restPath, query) => {
     return url;
 };
 
+// 百度 dlink 会 302 到 CDN 域名(无 CORS 头), 由服务端 fetch 跟随重定向后返回内容
+export const downloadHandler = {
+    url: '/proxy/dl',
+    method: 'get',
+    middleware: async ctx => {
+        const target = ctx.query.url;
+        if (!target) {
+            ctx.status = 400;
+            ctx.body = 'missing url';
+            return;
+        }
+        try {
+            const host = new URL(target).hostname;
+            if (!/(^|\.)baidu(pcs)?\.com$/.test(host)) {
+                ctx.status = 403;
+                ctx.body = 'host not allowed';
+                return;
+            }
+            const upstream = await fetch(target);
+            const buf = Buffer.from(await upstream.arrayBuffer());
+            ctx.status = upstream.status;
+            ctx.set('Content-Type', upstream.headers.get('content-type') || 'application/json');
+            ctx.body = buf;
+        } catch (e) {
+            ctx.status = 502;
+            ctx.body = e.message;
+        }
+    }
+};
+
 export const proxyHandler = {
     url: '/proxy/:target/(.*)',
     method: 'all',
