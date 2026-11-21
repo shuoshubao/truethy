@@ -54,7 +54,26 @@ export const proxyHandler = {
 
         // 透传请求体（GET/HEAD 无 body）
         const hasBody = !['GET', 'HEAD'].includes(ctx.request.method);
-        const body = hasBody ? ctx.req : undefined;
+        let body;
+        if (hasBody) {
+            const parsed = ctx.request.body;
+            const contentType = String(ctx.request.headers['content-type'] || '');
+            // bodyParser 已解析的 urlencoded / json: 原始流已被读走, 需重新序列化
+            if (parsed && typeof parsed === 'object' && !Buffer.isBuffer(parsed) && Object.keys(parsed).length) {
+                if (contentType.includes('application/json')) {
+                    body = JSON.stringify(parsed);
+                } else {
+                    body = new URLSearchParams(parsed).toString();
+                }
+                headers['content-length'] = Buffer.byteLength(body);
+            } else {
+                // multipart 等未被 bodyParser 处理的: 直接透传原始流
+                body = ctx.req;
+                if (ctx.request.headers['content-length']) {
+                    headers['content-length'] = ctx.request.headers['content-length'];
+                }
+            }
+        }
 
         const result = await new Promise((resolve, reject) => {
             const proxyReq = client.request(
@@ -72,7 +91,9 @@ export const proxyHandler = {
 
             proxyReq.setTimeout(30 * 1000, () => proxyReq.destroy());
 
-            if (body) {
+            if (Buffer.isBuffer(body) || typeof body === 'string') {
+                proxyReq.end(body);
+            } else if (body) {
                 body.pipe(proxyReq);
             } else {
                 proxyReq.end();
