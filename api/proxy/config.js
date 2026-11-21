@@ -30,5 +30,10 @@ export const proxyConfig = {
     bdaitts: {
         target: 'https://tsn.baidu.com',
         withCredentials: false
+    },
+    // 豆包(火山引擎)语音合成
+    doubaotts: {
+        target: 'https://openspeech.bytedance.com',
+        withCredentials: false
     }
 };

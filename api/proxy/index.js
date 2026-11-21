@@ -4,7 +4,10 @@ import { URL } from 'url';
 import { proxyConfig } from './config.js';
 
 // 需要透传到目标服务的请求头
-const FORWARD_REQUEST_HEADERS = ['accept', 'accept-language', 'authorization', 'user-agent', 'content-type', 'content-length'];
+const FORWARD_REQUEST_HEADERS = [
+    'accept', 'accept-language', 'authorization', 'user-agent', 'content-type', 'content-length',
+    'x-api-key', 'x-api-app-id', 'x-api-access-key', 'x-api-resource-id', 'x-api-request-id'
+];
 
 // 从目标服务转发回来的响应头
 const FORWARD_RESPONSE_HEADERS = ['content-type', 'content-length', 'content-disposition', 'cache-control', 'expires', 'last-modified', 'etag'];
