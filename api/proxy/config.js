@@ -21,5 +21,14 @@ export const proxyConfig = {
     baiduupload: {
         target: 'https://d.pcs.baidu.com',
         withCredentials: false
+    },
+    // 百度智能云语音合成: token 换取 + 音频合成
+    aip: {
+        target: 'https://aip.baidubce.com',
+        withCredentials: false
+    },
+    bdaitts: {
+        target: 'https://tsn.baidu.com',
+        withCredentials: false
     }
 };
