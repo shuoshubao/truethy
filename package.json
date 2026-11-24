@@ -19,7 +19,6 @@
         "@koa/bodyparser": "^6.0.0",
         "@koa/cors": "^5.0.0",
         "@koa/router": "^13.1.0",
-        "antd": "^5.25.4",
         "canvas": "^3.1.0",
         "esbuild": "^0.25.5",
         "glob": "^11.0.2",
@@ -30,13 +29,10 @@
         "md5": "^2.3.0",
         "prettier": "^2.8.8",
         "qrcode": "^1.5.4",
-        "react": "^19.1.0",
-        "react-dom": "^19.1.0",
         "sass": "^1.89.2",
         "uuid": "^11.1.0"
     },
     "devDependencies": {
-        "@vitejs/plugin-react": "^4.5.1",
         "vite": "^6.3.5"
     }
 }
