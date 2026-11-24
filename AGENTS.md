@@ -1,4 +1,4 @@
-# vercel-truethy
+# truethy
 
 ## 项目简介
 
@@ -25,7 +25,7 @@ api/
   proxy/
     config.js          通用转发的域名映射表
     index.js           通用转发 + 百度 dlink 下载代理
-    pan.js             百度网盘 OAuth（密钥写死在此，不下发浏览器）
+    pan.js             百度网盘 OAuth（从环境变量读取密钥，不下发浏览器）
 public/                 不经过构建的静态文件（如 ganlusi.html）
 dist/                   Vite 构建产物，已 gitignore（首页 index.html 构建后落在这里）
 ```
@@ -55,6 +55,6 @@ dist/                   Vite 构建产物，已 gitignore（首页 index.html �
 
 ## 注意事项
 
-- 百度网盘 AppKey / SecretKey 写死在 `api/proxy/pan.js` 顶部，仓库闭源。前端只持有用户自己的 access_token / refresh_token，不接触应用密钥。
+- 百度网盘 AppKey / SecretKey 通过 `BAIDU_PAN_APP_KEY` 和 `BAIDU_PAN_SECRET_KEY` 环境变量配置；本地可参考 `.env.example` 创建 `.env.local`。前端只持有用户自己的 access_token / refresh_token，不接触应用密钥。
 - `api/proxy/pan.js` 的路由导出放在 `proxy/index.js` 之前，避免 `/proxy/pan-*` 被通用通配路由 `/proxy/:target/(.*)` 抢占。
 - 部署到 Vercel 后接口自动生效；本地新增环境变量后需同步到 Vercel 的服务设置里。

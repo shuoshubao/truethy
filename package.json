@@ -1,11 +1,16 @@
 {
-    "name": "vercel-truethy",
+    "name": "truethy",
     "version": "1.0.0",
     "description": "Nodejs",
     "private": true,
     "type": "module",
     "author": "shuoshubao",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/shuoshubao/vercel-truethy.git"
+    },
+    "homepage": "https://truethy.vercel.app",
     "scripts": {
         "start": "vercel dev",
         "dev": "npx vite",
