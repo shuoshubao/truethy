@@ -172,6 +172,8 @@ export const proxyHandler = {
             ctx.set('Access-Control-Allow-Origin', origin);
             ctx.set('Access-Control-Allow-Credentials', 'true');
             ctx.set('Vary', 'Origin');
+            // 跨域时浏览器默认读不到自定义响应头, 需显式暴露
+            ctx.set('Access-Control-Expose-Headers', 'location, compression-count, image-width, image-height');
         }
 
         // 流式返回响应体
