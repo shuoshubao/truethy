@@ -35,5 +35,10 @@ export const proxyConfig = {
     doubaotts: {
         target: 'https://openspeech.bytedance.com',
         withCredentials: false
+    },
+    // TinyPNG / TinyJPG 图片压缩
+    tinify: {
+        target: 'https://api.tinify.com',
+        withCredentials: false
     }
 };

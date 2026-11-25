@@ -10,7 +10,11 @@ const FORWARD_REQUEST_HEADERS = [
 ];
 
 // 从目标服务转发回来的响应头
-const FORWARD_RESPONSE_HEADERS = ['content-type', 'content-length', 'content-disposition', 'cache-control', 'expires', 'last-modified', 'etag'];
+const FORWARD_RESPONSE_HEADERS = [
+    'content-type', 'content-length', 'content-disposition', 'cache-control', 'expires', 'last-modified', 'etag',
+    // TinyPNG: 201 响应通过 Location 给出压缩图地址, 其余为压缩计数与图片尺寸
+    'location', 'compression-count', 'image-width', 'image-height'
+];
 
 const getClient = url => (url.protocol === 'https:' ? https : http);
 
@@ -71,7 +75,15 @@ export const proxyHandler = {
             return;
         }
 
-        const targetUrl = buildTargetUrl(config.target, restPath, ctx.querystring);
+        // TinyPNG: key 固定从 tinify_key 参数取, 剔除后不转发给上游
+        const isTinify = targetKey === 'tinify';
+        const query = { ...ctx.query };
+        const apiKey = isTinify ? String(query.tinify_key ?? '') : '';
+        if (isTinify) {
+            delete query.tinify_key;
+        }
+        const queryString = isTinify ? new URLSearchParams(query).toString() : ctx.querystring;
+        const targetUrl = buildTargetUrl(config.target, restPath, queryString);
         const client = getClient(targetUrl);
 
         // 透传请求头
@@ -83,6 +95,9 @@ export const proxyHandler = {
         });
         if (config.withCredentials && ctx.request.headers.cookie) {
             headers.cookie = ctx.request.headers.cookie;
+        }
+        if (apiKey) {
+            headers.authorization = `Basic ${Buffer.from(`api:${apiKey}`).toString('base64')}`;
         }
 
         // 透传请求体（GET/HEAD 无 body）
