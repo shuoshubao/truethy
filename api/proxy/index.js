@@ -75,15 +75,7 @@ export const proxyHandler = {
             return;
         }
 
-        // TinyPNG: key 固定从 tinify_key 参数取, 剔除后不转发给上游
-        const isTinify = targetKey === 'tinify';
-        const query = { ...ctx.query };
-        const apiKey = isTinify ? String(query.tinify_key ?? '') : '';
-        if (isTinify) {
-            delete query.tinify_key;
-        }
-        const queryString = isTinify ? new URLSearchParams(query).toString() : ctx.querystring;
-        const targetUrl = buildTargetUrl(config.target, restPath, queryString);
+        const targetUrl = buildTargetUrl(config.target, restPath, ctx.querystring);
         const client = getClient(targetUrl);
 
         // 透传请求头
@@ -95,9 +87,6 @@ export const proxyHandler = {
         });
         if (config.withCredentials && ctx.request.headers.cookie) {
             headers.cookie = ctx.request.headers.cookie;
-        }
-        if (apiKey) {
-            headers.authorization = `Basic ${Buffer.from(`api:${apiKey}`).toString('base64')}`;
         }
 
         // 透传请求体（GET/HEAD 无 body）
