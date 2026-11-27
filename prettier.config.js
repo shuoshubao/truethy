@@ -1,11 +1,4 @@
-/*
- * @Author: shuoshubao
- * @Date: 2025-05-30 19:28:04
- * @LastEditors: shuoshubao
- * @LastEditTime: 2025-06-05 18:57:40
- * @Description: prettier 配置
- */
-module.exports = {
+export default {
     printWidth: 160,
     useTabs: false,
     tabWidth: 4,

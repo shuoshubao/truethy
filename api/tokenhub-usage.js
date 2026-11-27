@@ -1,11 +1,11 @@
 import crypto from 'crypto';
 
-const HOST = 'tokenhub.tencentcloudapi.com';
-const ENDPOINT = `https://${HOST}/`;
-const SERVICE = 'tokenhub';
-const ACTION = 'DescribeUsageRankList';
-const VERSION = '2026-03-22';
-const REGION = 'ap-guangzhou';
+const Host = 'tokenhub.tencentcloudapi.com';
+const Endpoint = `https://${Host}/`;
+const Service = 'tokenhub';
+const Action = 'DescribeUsageRankList';
+const Version = '2026-03-22';
+const Region = 'ap-guangzhou';
 
 const sha256 = value => crypto.createHash('sha256').update(value).digest();
 const hmac = (key, value) => crypto.createHmac('sha256', key).update(value).digest();
@@ -13,19 +13,19 @@ const hmac = (key, value) => crypto.createHmac('sha256', key).update(value).dige
 // 腾讯云 TC3-HMAC-SHA256 签名
 const buildAuthorization = (secretId, secretKey, timestamp, payload) => {
     const date = new Date(timestamp * 1000).toISOString().slice(0, 10);
-    const credentialScope = `${date}/${SERVICE}/tc3_request`;
+    const credentialScope = `${date}/${Service}/tc3_request`;
     const signedHeaders = 'content-type;host';
-    const canonicalHeaders = `content-type:application/json; charset=utf-8\nhost:${HOST}\n`;
+    const canonicalHeaders = `content-type:application/json; charset=utf-8\nhost:${Host}\n`;
     const canonicalRequest = ['POST', '/', '', canonicalHeaders, signedHeaders, sha256(payload).toString('hex')].join('\n');
     const stringToSign = ['TC3-HMAC-SHA256', timestamp, credentialScope, sha256(canonicalRequest).toString('hex')].join('\n');
     const secretDate = hmac(`TC3${secretKey}`, date);
-    const secretService = hmac(secretDate, SERVICE);
+    const secretService = hmac(secretDate, Service);
     const secretSigning = hmac(secretService, 'tc3_request');
     const signature = hmac(secretSigning, stringToSign).toString('hex');
     return `TC3-HMAC-SHA256 Credential=${secretId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 };
 
-// 统计粒度必须匹配时间跨度: ≤1天→60, 1~5天→300, 5~10天→3600, >10天→86400
+// 统计粒度必须匹配时间跨度: <=1 day -> 60, 1-5 days -> 300, 5-10 days -> 3600, >10 days -> 86400
 const calcPeriod = (start, end) => {
     const days = (new Date(end) - new Date(start)) / 86400000;
     if (days <= 1) return 60;
@@ -44,7 +44,7 @@ const defaultRange = () => {
     return { start, end };
 };
 
-export const getTokenHubUsage = {
+export const GetTokenHubUsage = {
     url: '/api/tokenhub-usage',
     method: 'post',
     middleware: async ctx => {
@@ -70,16 +70,16 @@ export const getTokenHubUsage = {
         const payload = JSON.stringify(params);
         const timestamp = Math.floor(Date.now() / 1000);
         try {
-            const response = await fetch(ENDPOINT, {
+            const response = await fetch(Endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json; charset=utf-8',
-                    Host: HOST,
+                    Host,
                     Authorization: buildAuthorization(secretId, secretKey, timestamp, payload),
-                    'X-TC-Action': ACTION,
+                    'X-TC-Action': Action,
                     'X-TC-Timestamp': String(timestamp),
-                    'X-TC-Version': VERSION,
-                    'X-TC-Region': REGION
+                    'X-TC-Version': Version,
+                    'X-TC-Region': Region
                 },
                 body: payload
             });

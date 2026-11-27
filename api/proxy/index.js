@@ -1,28 +1,44 @@
 import http from 'http';
 import https from 'https';
 import { URL } from 'url';
-import { proxyConfig } from './config.js';
+import { ProxyConfig } from './config.js';
 
 // 需要透传到目标服务的请求头
-const FORWARD_REQUEST_HEADERS = [
-    'accept', 'accept-language', 'authorization', 'user-agent', 'content-type', 'content-length',
-    'x-api-key', 'x-api-app-id', 'x-api-access-key', 'x-api-resource-id', 'x-api-request-id',
-    // Anthropic Messages 协议（TokenHub 兼容）要求携带
+const ForwardRequestHeaders = [
+    'accept',
+    'accept-language',
+    'authorization',
+    'user-agent',
+    'content-type',
+    'content-length',
+    'x-api-key',
+    'x-api-app-id',
+    'x-api-access-key',
+    'x-api-resource-id',
+    'x-api-request-id',
+    // Anthropic Messages 协议 (TokenHub 兼容) 要求携带
     'anthropic-version'
 ];
 
 // 从目标服务转发回来的响应头
-const FORWARD_RESPONSE_HEADERS = [
-    'content-type', 'content-length', 'content-disposition', 'cache-control', 'expires', 'last-modified', 'etag',
+const ForwardResponseHeaders = [
+    'content-type',
+    'content-length',
+    'content-disposition',
+    'cache-control',
+    'expires',
+    'last-modified',
+    'etag',
     // TinyPNG: 201 响应通过 Location 给出压缩图地址, 其余为压缩计数与图片尺寸
-    'location', 'compression-count', 'image-width', 'image-height'
+    'location',
+    'compression-count',
+    'image-width',
+    'image-height'
 ];
 
 const getClient = url => (url.protocol === 'https:' ? https : http);
 
-/**
- * 组装目标 URL: 去掉 `/proxy/<targetKey>` 前缀后拼到 target 上
- */
+// 组装目标 URL: 去掉 /<targetKey> 前缀后拼到 target 上
 const buildTargetUrl = (target, restPath, query) => {
     const url = new URL(target);
     const rest = restPath ? `/${restPath}`.replace(/\/+/g, '/') : '';
@@ -33,9 +49,9 @@ const buildTargetUrl = (target, restPath, query) => {
     return url;
 };
 
-// 百度 dlink 会 302 到 CDN 域名(无 CORS 头), 由服务端 fetch 跟随重定向后返回内容
-export const downloadHandler = {
-    url: '/proxy/dl',
+// 百度 dlink 会 302 到 CDN 域名 (无 CORS 头), 由服务端 fetch 跟随重定向后返回内容
+export const DownloadHandler = {
+    url: '/dl',
     method: 'get',
     middleware: async ctx => {
         const target = ctx.query.url;
@@ -63,13 +79,13 @@ export const downloadHandler = {
     }
 };
 
-export const proxyHandler = {
-    url: '/proxy/:target/(.*)',
+export const ProxyHandler = {
+    url: '/:target/(.*)',
     method: 'all',
     middleware: async ctx => {
         const { target: targetKey } = ctx.params;
         const restPath = ctx.params[0] || '';
-        const config = proxyConfig[targetKey];
+        const config = ProxyConfig[targetKey];
 
         if (!config) {
             ctx.status = 404;
@@ -82,7 +98,7 @@ export const proxyHandler = {
 
         // 透传请求头
         const headers = {};
-        FORWARD_REQUEST_HEADERS.forEach(name => {
+        ForwardRequestHeaders.forEach(name => {
             if (ctx.request.headers[name]) {
                 headers[name] = ctx.request.headers[name];
             }
@@ -91,7 +107,7 @@ export const proxyHandler = {
             headers.cookie = ctx.request.headers.cookie;
         }
 
-        // 透传请求体（GET/HEAD 无 body）
+        // 透传请求体 (GET/HEAD 无 body)
         const hasBody = !['GET', 'HEAD'].includes(ctx.request.method);
         let body;
         if (hasBody) {
@@ -144,15 +160,15 @@ export const proxyHandler = {
         // 透传状态码
         ctx.status = proxyRes.statusCode;
 
-        // 透传响应头（Content-Type 等在下方单独处理，避免覆盖）
-        FORWARD_RESPONSE_HEADERS.forEach(name => {
+        // 透传响应头 (Content-Type 等在下方单独处理, 避免覆盖)
+        ForwardResponseHeaders.forEach(name => {
             const value = proxyRes.headers[name];
             if (value) {
                 ctx.set(name, value);
             }
         });
 
-        // 如需要，透传 set-cookie
+        // 如需要, 透传 set-cookie
         if (config.withCredentials && proxyRes.headers['set-cookie']) {
             ctx.set('set-cookie', proxyRes.headers['set-cookie']);
         }

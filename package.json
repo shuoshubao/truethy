@@ -1,7 +1,7 @@
 {
     "name": "truethy",
     "version": "1.0.0",
-    "description": "Nodejs",
+    "description": "接口代理与转发服务",
     "private": true,
     "type": "module",
     "author": "shuoshubao",
@@ -12,32 +12,17 @@
     },
     "homepage": "https://truethy.vercel.app",
     "scripts": {
-        "start": "vercel dev",
-        "dev": "npx vite",
-        "build": "npx vite build",
-        "vercel-build": "npm run build"
+        "start": "node index.js",
+        "dev": "vercel dev",
+        "format": "prettier --write index.js api prettier.config.js"
     },
     "dependencies": {
-        "@babel/core": "^7.27.4",
-        "@babel/preset-env": "^7.27.2",
-        "@babel/preset-react": "^7.27.1",
         "@koa/bodyparser": "^6.0.0",
         "@koa/cors": "^5.0.0",
         "@koa/router": "^13.1.0",
-        "canvas": "^3.1.0",
-        "esbuild": "^0.25.5",
-        "glob": "^11.0.2",
-        "koa": "^3.0.0",
-        "koa-static": "^5.0.0",
-        "less": "^4.3.0",
-        "lodash-es": "^4.17.21",
-        "md5": "^2.3.0",
-        "prettier": "^2.8.8",
-        "qrcode": "^1.5.4",
-        "sass": "^1.89.2",
-        "uuid": "^11.1.0"
+        "koa": "^3.0.0"
     },
     "devDependencies": {
-        "vite": "^6.3.5"
+        "prettier": "^3.10.1"
     }
 }
