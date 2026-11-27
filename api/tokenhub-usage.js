@@ -25,6 +25,15 @@ const buildAuthorization = (secretId, secretKey, timestamp, payload) => {
     return `TC3-HMAC-SHA256 Credential=${secretId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 };
 
+// 统计粒度必须匹配时间跨度: ≤1天→60, 1~5天→300, 5~10天→3600, >10天→86400
+const calcPeriod = (start, end) => {
+    const days = (new Date(end) - new Date(start)) / 86400000;
+    if (days <= 1) return 60;
+    if (days <= 5) return 300;
+    if (days <= 10) return 3600;
+    return 86400;
+};
+
 const pad = value => String(value).padStart(2, '0');
 
 // 北京时间当月 1 号到当前时刻, RFC3339 格式
@@ -57,6 +66,7 @@ export const getTokenHubUsage = {
         if (target) {
             params.Target = target;
         }
+        params.Period = calcPeriod(params.StartTime, params.EndTime);
         const payload = JSON.stringify(params);
         const timestamp = Math.floor(Date.now() / 1000);
         try {
