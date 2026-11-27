@@ -6,7 +6,9 @@ import { proxyConfig } from './config.js';
 // 需要透传到目标服务的请求头
 const FORWARD_REQUEST_HEADERS = [
     'accept', 'accept-language', 'authorization', 'user-agent', 'content-type', 'content-length',
-    'x-api-key', 'x-api-app-id', 'x-api-access-key', 'x-api-resource-id', 'x-api-request-id'
+    'x-api-key', 'x-api-app-id', 'x-api-access-key', 'x-api-resource-id', 'x-api-request-id',
+    // Anthropic Messages 协议（TokenHub 兼容）要求携带
+    'anthropic-version'
 ];
 
 // 从目标服务转发回来的响应头
@@ -126,7 +128,7 @@ export const proxyHandler = {
 
             proxyReq.on('error', reject);
 
-            proxyReq.setTimeout(30 * 1000, () => proxyReq.destroy());
+            proxyReq.setTimeout((config.timeout || 30) * 1000, () => proxyReq.destroy());
 
             if (Buffer.isBuffer(body) || typeof body === 'string') {
                 proxyReq.end(body);
