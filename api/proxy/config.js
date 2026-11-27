@@ -43,7 +43,7 @@ export const proxyConfig = {
     },
     // 腾讯云 TokenHub 大模型服务平台（按量计费，OpenAI / Anthropic 兼容）
     tokenhub: {
-        target: 'https://tokenhub.tencentcloudmaas.com',
+        target: 'https://tokenhub.tencentmaas.com',
         withCredentials: false,
         // 模型推理 / 流式响应较慢，放宽到 5 分钟
         timeout: 300
