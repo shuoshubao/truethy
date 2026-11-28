@@ -52,5 +52,20 @@ export const ProxyConfig = {
         target: 'https://tokenhub.tencentmaas.com',
         withCredentials: false,
         timeout: 300
+    },
+    // 维基百科
+    wikipedia: {
+        target: 'https://zh.wikipedia.org',
+        withCredentials: false
+    },
+    // 东方财富行情
+    eastmoney: {
+        target: 'https://push2.eastmoney.com',
+        withCredentials: false
+    },
+    // 东方财富名称/代码搜索
+    eastmoneysearch: {
+        target: 'https://searchapi.eastmoney.com',
+        withCredentials: false
     }
 };
